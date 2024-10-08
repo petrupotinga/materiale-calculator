@@ -19,26 +19,26 @@ import static lombok.AccessLevel.PRIVATE;
 public class MaterialController {
 
     MaterialRepository materialRepository;
+//
+//    @PostMapping("/materials") // Endpoint pentru adăugarea materialelor
+//    public MaterialsEntity addMaterial(@RequestBody MaterialsEntity material) {
+//        return materialRepository.save(material); // Salvează materialul în baza de date
+//    }
+//
+//    @GetMapping("/materials")
+//    public List<MaterialsEntity> findAllMaterials() {
+//        return materialRepository.findAll();
+//    }
 
-    @PostMapping("/materials") // Endpoint pentru adăugarea materialelor
-    public MaterialsEntity addMaterial(@RequestBody MaterialsEntity material) {
-        return materialRepository.save(material); // Salvează materialul în baza de date
-    }
-
-    @GetMapping("/materials")
-    public List<MaterialsEntity> findAllMaterials() {
-        return materialRepository.findAll();
-    }
-
-    @PostMapping("/calculate")
-    public BigDecimal calculator(@RequestBody Map<Long, BigDecimal> productToCount) {
-        return productToCount.entrySet()
-                .stream()
-                .map(
-                        entry -> materialRepository.findById(entry.getKey())
-                                .map(entity -> entity.calculatePrice(entry.getValue()))
-                                .orElse(BigDecimal.ZERO)
-                ).reduce(BigDecimal::add)
-                .orElse(BigDecimal.ZERO);
-    }
+//    @PostMapping("/calculate")
+//    public BigDecimal calculator(@RequestBody Map<Long, BigDecimal> productToCount) {
+//        return productToCount.entrySet()
+//                .stream()
+//                .map(
+//                        entry -> materialRepository.findById(entry.getKey())
+//                                .map(entity -> entity.calculatePrice(entry.getValue()))
+//                                .orElse(BigDecimal.ZERO)
+//                ).reduce(BigDecimal::add)
+//                .orElse(BigDecimal.ZERO);
+//    }
 }
