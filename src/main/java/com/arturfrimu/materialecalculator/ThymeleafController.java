@@ -86,6 +86,4 @@ public class ThymeleafController {
         model.addAttribute("totalPrice", totalPrice);  // Adăugăm prețul total în model
         return "materials-view";  // Rămânem pe aceeași pagină
     }
-
-
 }
