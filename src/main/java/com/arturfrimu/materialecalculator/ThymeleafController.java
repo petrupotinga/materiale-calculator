@@ -48,12 +48,22 @@ public class ThymeleafController {
 
         return "redirect:/materials";
     }
+    @PostMapping("/materials/update-price")
+    public String updateMaterialPrice(@RequestParam Long materialId,
+                                      @RequestParam BigDecimal newPrice,
+                                      Model model) {
+        System.out.println("Material ID: " + materialId);
+        System.out.println("New Price: " + newPrice);
 
-    @PostMapping("/materials/calculate")
-    public String calculator(@RequestParam Map<String, String> productToCount, Model model) {
-        System.out.println("Produse primite pentru calculare: " + productToCount.toString());
+        // Răspunsul pentru actualizarea prețului
+        materialRepository.findById(materialId)
+                .map(material -> {
+                    material.setPrice(newPrice);
+                    materialRepository.save(material);
+                    return material;
+                })
+                .orElseThrow(() -> new RuntimeException("Materialul nu a fost găsit"));
 
-        // Obținem toate materialele pentru afișare în tabel
         List<MaterialsEntity> materials = materialRepository.findAll();
         List<AllMaterialsResponse> materialsResponse = materials.stream()
                 .map(material -> new AllMaterialsResponse(
@@ -61,29 +71,68 @@ public class ThymeleafController {
                         material.getMaterialName(),
                         material.getPrice()))
                 .collect(Collectors.toList());
-        model.addAttribute("materials", materialsResponse);  // Afișăm din nou materialele
+        model.addAttribute("materials", materialsResponse);
 
-        // Calculăm prețul total
-        BigDecimal totalPrice = productToCount.entrySet()
-                .stream()
-                .map(entry -> {
-                    System.out.println("Cheie primită: " + entry.getKey() + ", Valoare: " + entry.getValue()); // Debugging
-                    try {
-                        // Extragem doar ID-ul materialului din cheia 'productToCount[1]'
-                        String key = entry.getKey().replaceAll("[^0-9]", ""); // Eliminăm orice caracter care nu este cifră
-                        Long id = Long.valueOf(key); // Conversia din String în Long
-
-                        return materialRepository.findById(id)
-                                .map(entity -> entity.calculatePrice(new BigDecimal(entry.getValue())))
-                                .orElse(BigDecimal.ZERO);
-                    } catch (NumberFormatException e) {
-                        System.out.println("Eroare de conversie pentru cheia: " + entry.getKey()); // Debugging
-                        return BigDecimal.ZERO; // Dacă conversia eșuează, returnăm zero
-                    }
-                }).reduce(BigDecimal::add)
-                .orElse(BigDecimal.ZERO);
-
-        model.addAttribute("totalPrice", totalPrice);  // Adăugăm prețul total în model
-        return "materials-view";  // Rămânem pe aceeași pagină
+        return "materials-view";
     }
+    
+    @PostMapping("/materials/delete")
+    public String deleteMaterial(@RequestParam Long materialId, Model model) {
+        materialRepository.findById(materialId)
+                .ifPresentOrElse(
+                        materialRepository::delete, // Șterge materialul dacă este găsit
+                        () -> { throw new RuntimeException("Materialul nu a fost găsit"); } // Aruncă eroare dacă nu există
+                );
+
+        // Actualizăm lista materialelor după ștergere
+        List<MaterialsEntity> materials = materialRepository.findAll();
+        List<AllMaterialsResponse> materialsResponse = materials.stream()
+                .map(material -> new AllMaterialsResponse(
+                        material.getId(),
+                        material.getMaterialName(),
+                        material.getPrice()))
+                .collect(Collectors.toList());
+        model.addAttribute("materials", materialsResponse);
+
+        return "materials-view"; // Redirecționăm către pagina cu materialele actualizate
+    }
+
+
+//    @PostMapping("/materials/calculate")
+//    public String calculator(@RequestParam Map<String, String> productToCount, Model model) {
+//        System.out.println("Produse primite pentru calculare: " + productToCount.toString());
+//
+//        // Obținem toate materialele pentru afișare în tabel
+//        List<MaterialsEntity> materials = materialRepository.findAll();
+//        List<AllMaterialsResponse> materialsResponse = materials.stream()
+//                .map(material -> new AllMaterialsResponse(
+//                        material.getId(),
+//                        material.getMaterialName(),
+//                        material.getPrice()))
+//                .collect(Collectors.toList());
+//        model.addAttribute("materials", materialsResponse);  // Afișăm din nou materialele
+//
+//        // Calculăm prețul total
+//        BigDecimal totalPrice = productToCount.entrySet()
+//                .stream()
+//                .map(entry -> {
+//                    System.out.println("Cheie primită: " + entry.getKey() + ", Valoare: " + entry.getValue()); // Debugging
+//                    try {
+//                        // Extragem doar ID-ul materialului din cheia 'productToCount[1]'
+//                        String key = entry.getKey().replaceAll("[^0-9]", ""); // Eliminăm orice caracter care nu este cifră
+//                        Long id = Long.valueOf(key); // Conversia din String în Long
+//
+//                        return materialRepository.findById(id)
+//                                .map(entity -> entity.calculatePrice(new BigDecimal(entry.getValue())))
+//                                .orElse(BigDecimal.ZERO);
+//                    } catch (NumberFormatException e) {
+//                        System.out.println("Eroare de conversie pentru cheia: " + entry.getKey()); // Debugging
+//                        return BigDecimal.ZERO; // Dacă conversia eșuează, returnăm zero
+//                    }
+//                }).reduce(BigDecimal::add)
+//                .orElse(BigDecimal.ZERO);
+//
+//        model.addAttribute("totalPrice", totalPrice);  // Adăugăm prețul total în model
+//        return "materials-view";  // Rămânem pe aceeași pagină
+//    }
 }

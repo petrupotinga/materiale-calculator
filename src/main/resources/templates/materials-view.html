@@ -6,15 +6,13 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
     <script>
-        // Funcția pentru calcularea prețului produsului la fiecare modificare a cantității
         function calculateProductPrice(input, price, row) {
             const quantity = input.value;
             const productPrice = quantity * price;
             row.querySelector('.product-total-price').textContent = productPrice.toFixed(2);
-            calculateTotalPrice(); // Actualizăm prețul total la fiecare schimbare
+            calculateTotalPrice();
         }
 
-        // Funcția pentru calcularea prețului total al întregii coloane "Preț Produse"
         function calculateTotalPrice() {
             let total = 0;
             const rows = document.querySelectorAll('tbody tr');
@@ -24,11 +22,9 @@
                 total += productPrice;
             });
 
-            // Afișăm prețul total
             document.querySelector('.total-price').textContent = total.toFixed(2);
         }
 
-        // Funcția care inițializează calculul prețului pentru toate materialele din tabel
         function initializePriceCalculations() {
             const rows = document.querySelectorAll('tbody tr');
             rows.forEach(row => {
@@ -36,18 +32,14 @@
                 const input = row.querySelector('input[type="number"]');
                 const productPriceCell = row.querySelector('.product-total-price');
 
-                // Inițializăm cu valoarea implicită
                 productPriceCell.textContent = '0.00';
 
-                // Ascultăm modificările de cantitate
                 input.addEventListener('input', () => calculateProductPrice(input, price, row));
             });
 
-            // Calculăm prețul total la încărcarea paginii
             calculateTotalPrice();
         }
 
-        // Inițializăm scriptul după încărcarea paginii
         window.addEventListener('DOMContentLoaded', initializePriceCalculations);
     </script>
 </head>
@@ -68,8 +60,8 @@
         <button type="submit" class="btn btn-primary">Salvează produsul</button>
     </form>
 
-    <!-- Formular pentru calcularea prețului total al materialelor -->
-    <form th:action="@{/materials/calculate}" method="post">
+    <!-- Formular pentru vizualizarea materialelor și calcularea prețului total -->
+    <form th:action="@{/materials}" method="post">
         <table class="table table-striped table-hover">
             <thead class="thead-dark">
             <tr>
@@ -77,7 +69,8 @@
                 <th>Nume Produs</th>
                 <th>Pret</th>
                 <th>Cantitate</th>
-                <th>Pret Produse</th> <!-- Coloană pentru prețul total al produsului -->
+                <th>Pret Produse</th>
+                <th>Acțiuni</th> <!-- Coloană pentru acțiuni (actualizare și ștergere) -->
             </tr>
             </thead>
             <tbody>
@@ -88,12 +81,29 @@
                 <td>
                     <input type="number" th:name="'productToCount[' + ${material.id} + ']'" min="0" value="0"/>
                 </td>
-                <td class="product-total-price">0.00</td> <!-- Celulă pentru prețul produsului -->
+                <td class="product-total-price">0.00</td>
+
+                <!-- Coloană pentru acțiuni -->
+                <td>
+
+                    <!-- Formular pentru actualizarea prețului -->
+                    <form th:action="@{/materials/update-price}" method="post" style="display: inline-block;">
+                        <input type="hidden" name="materialId" th:value="${material.id}"/>
+                        <input type="number" name="newPrice" step="0.01" placeholder="Preț Nou" required style="width: 80px;"/>
+                        <button type="submit" class="btn btn-sm btn-warning">Actualizează</button>
+                    </form>
+
+                    <!-- Formular pentru ștergerea materialului -->
+                    <form th:action="@{/materials/delete}" method="post" style="display: inline-block;">
+                        <input type="hidden" name="materialId" th:value="${material.id}"/>
+                        <button type="submit" class="btn btn-sm btn-danger">Șterge</button>
+                    </form>
+                </td>
             </tr>
             </tbody>
         </table>
 
-        <!-- Afișăm prețul total în locul butonului -->
+        <!-- Afișăm prețul total -->
         <div class="mt-4">
             <h3>Preț Total: <span class="total-price">0.00</span></h3>
         </div>
