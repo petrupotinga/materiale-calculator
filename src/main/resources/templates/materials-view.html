@@ -17,10 +17,6 @@
         console.log("Formularul a fost închis");
     }
 }
-
-
-
-
         function calculateProductPrice(input, price, row) {
             const quantity = input.value;
             const productPrice = quantity * price;
@@ -93,10 +89,7 @@
         </div>
     </form>
 
-<!--    &lt;!&ndash; Buton pentru afișarea formularului de adăugare &ndash;&gt;-->
-<!--    <button class="btn btn-primary mt-4" onclick="toggleForm('addForm')">Adăugare Produs</button>-->
-
-    <button type="button" class="btn btn-primary mt-4" onclick="toggleForm('addForm')">Adăugare Produs</button>
+    <button type="button" class="btn btn-dark mt-4" onclick="toggleForm('addForm')">Adăugare Produs</button>
 
 
     <!-- Formular pentru adăugarea materialelor (ascuns inițial) -->
@@ -110,11 +103,11 @@
             <label for="price">Prețul</label>
             <input type="text" class="form-control" id="price" name="price" placeholder="Introduceți prețul" required>
         </div>
-        <button type="submit" class="btn btn-primary">Salvează produsul</button>
+        <button type="submit" class="btn btn-dark">Salvează produsul</button>
     </form>
 
     <!-- Buton pentru afișarea formularului de actualizare -->
-    <button class="btn btn-warning mt-4" onclick="toggleForm('updateForm')">Actualizează Prețul</button>
+    <button class="btn btn-dark mt-4" onclick="toggleForm('updateForm')">Actualizează Prețul</button>
 
     <!-- Formular pentru actualizarea prețului materialului (ascuns inițial) -->
     <form id="updateForm" th:action="@{/materials/update-price}" method="post" class="mb-4" style="display: none;">
@@ -127,11 +120,11 @@
             <label for="newPrice">Preț Nou</label>
             <input type="number" step="0.01" class="form-control" id="newPrice" name="newPrice" placeholder="Introduceți noul preț" required>
         </div>
-        <button type="submit" class="btn btn-warning">Actualizează Prețul</button>
+        <button type="submit" class="btn btn-dark">Actualizează Prețul</button>
     </form>
 
     <!-- Buton pentru afișarea formularului de ștergere -->
-    <button type="button" class="btn btn-danger mt-4" onclick="toggleForm('deleteForm')">Șterge Produs</button>
+    <button type="button" class="btn btn-dark mt-4" onclick="toggleForm('deleteForm')">Șterge Produs</button>
 
     <!-- Formular pentru ștergerea materialelor (ascuns inițial) -->
     <form id="deleteForm" th:action="@{/materials/delete}" method="post" class="mb-4" style="display: none;">
@@ -140,7 +133,7 @@
             <label for="deletematerialId">ID Material</label>
             <input type="number" class="form-control" id="deletematerialId" name="deletematerialId" placeholder="Introduceți ID-ul materialului" required>
         </div>
-        <button type="submit" class="btn btn-danger">Șterge Produsul</button>
+        <button type="submit" class="btn btn-dark">Șterge Produsul</button>
     </form>
 
 </div>
