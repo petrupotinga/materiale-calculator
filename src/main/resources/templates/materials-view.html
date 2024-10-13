@@ -7,16 +7,14 @@
 
     <script>
         function toggleForm(formId) {
-    const form = document.getElementById(formId);
-    console.log("Formul său este acum: ", form.style.display);  // Mesaj de debug
-    if (form.style.display === "none" || form.style.display === "") {
-        form.style.display = "block";
-        console.log("Formularul a fost deschis");
-    } else {
-        form.style.display = "none";
-        console.log("Formularul a fost închis");
-    }
-}
+            const form = document.getElementById(formId);
+            if (form.style.display === "none" || form.style.display === "") {
+                form.style.display = "block";
+            } else {
+                form.style.display = "none";
+            }
+        }
+
         function calculateProductPrice(input, price, row) {
             const quantity = input.value;
             const productPrice = quantity * price;
@@ -59,7 +57,7 @@
     <h1>Lista Materialelor</h1>
 
     <!-- Formular pentru vizualizarea materialelor și calcularea prețului total -->
-    <form th:action="@{/materials}" method="get">
+    <form th:action="@{/materials/print-pdf}" method="get">
         <table class="table table-striped table-hover">
             <thead class="thead-dark">
             <tr>
@@ -87,10 +85,12 @@
         <div class="mt-4">
             <h3>Preț Total: <span class="total-price">0.00</span></h3>
         </div>
+
+        <!-- Buton pentru a descărca PDF-ul -->
+        <button type="submit" class="btn btn-dark mt-4">Descarcă PDF</button>
     </form>
 
     <button type="button" class="btn btn-dark mt-4" onclick="toggleForm('addForm')">Adăugare Produs</button>
-
 
     <!-- Formular pentru adăugarea materialelor (ascuns inițial) -->
     <form id="addForm" th:action="@{/materials/adaugare}" method="post" class="mb-4" style="display: none;">
@@ -107,7 +107,7 @@
     </form>
 
     <!-- Buton pentru afișarea formularului de actualizare -->
-    <button class="btn btn-dark mt-4" onclick="toggleForm('updateForm')">Actualizează Prețul</button>
+    <button type="button" class="btn btn-dark mt-4" onclick="toggleForm('updateForm')">Actualizează Prețul</button>
 
     <!-- Formular pentru actualizarea prețului materialului (ascuns inițial) -->
     <form id="updateForm" th:action="@{/materials/update-price}" method="post" class="mb-4" style="display: none;">
