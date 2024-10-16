@@ -123,7 +123,7 @@ public class ThymeleafController {
         table.addCell("Nume Produs");
         table.addCell("Pret");
         table.addCell("Cantitate");
-        table.addCell("Pret Produse");
+        table.addCell("Pret Total");
 
         // Adaugă materialele
         BigDecimal totalPrice = BigDecimal.ZERO;
@@ -150,7 +150,7 @@ public class ThymeleafController {
         document.add(table);
 
         // Adaugă prețul total
-        document.add(new Paragraph("Preț Total: " + totalPrice.toString()));
+        document.add(new Paragraph("Suma Totala: " + totalPrice.toString()));
 
         document.close();
 
