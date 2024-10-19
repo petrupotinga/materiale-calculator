@@ -1,6 +1,5 @@
 package com.arturfrimu.materialecalculator;
 
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,22 +18,19 @@ import static lombok.AccessLevel.PRIVATE;
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class MaterialController {
 
-    @PostConstruct
-    public void postConstruct() {
-        materialRepository.addMaterials(new MaterialsEntity(1L, "Scanduri", BigDecimal.valueOf(1)));
-        materialRepository.addMaterials(new MaterialsEntity(2L, "Chiroane", BigDecimal.valueOf(5)));
-        materialRepository.addMaterials(new MaterialsEntity(3L, "Tinte", BigDecimal.valueOf(10)));
-        materialRepository.addMaterials(new MaterialsEntity(4L, "Table", BigDecimal.valueOf(20)));
-    }
-
     MaterialRepository materialRepository;
 
-    @GetMapping
+    @PostMapping("/materials") // Endpoint pentru adăugarea materialelor
+    public MaterialsEntity addMaterial(@RequestBody MaterialsEntity material) {
+        return materialRepository.save(material); // Salvează materialul în baza de date
+    }
+
+    @GetMapping("/materials")
     public List<MaterialsEntity> findAllMaterials() {
         return materialRepository.findAll();
     }
 
-    @PostMapping
+    @PostMapping("/calculate")
     public BigDecimal calculator(@RequestBody Map<Long, BigDecimal> productToCount) {
         return productToCount.entrySet()
                 .stream()
