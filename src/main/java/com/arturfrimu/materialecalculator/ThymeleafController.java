@@ -114,12 +114,11 @@ public class ThymeleafController {
         PdfWriter.getInstance(document, out);
 
         document.open();
-        PdfPTable table = new PdfPTable(5);
+        PdfPTable table = new PdfPTable(4);
         table.setWidthPercentage(100);
-        table.setWidths(new int[]{1, 3, 3, 2, 3});
+        table.setWidths(new int[]{3, 3, 2, 3});
 
         // Adaugă antetul tabelului
-        table.addCell("ID");
         table.addCell("Nume Produs");
         table.addCell("Pret");
         table.addCell("Cantitate");
@@ -129,7 +128,6 @@ public class ThymeleafController {
         BigDecimal totalPrice = BigDecimal.ZERO;
         List<MaterialsEntity> materials = materialRepository.findAll();
         for (MaterialsEntity material : materials) {
-            table.addCell(material.getId().toString());
             table.addCell(material.getMaterialName());
             table.addCell(material.getPrice().toString());
 
