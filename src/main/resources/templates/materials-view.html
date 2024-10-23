@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Lista materialelor</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+  <h1>Lista Materialelor</h1>
+  <form th:action="@{/materials}" method="post" class="mb-4">
+    <div class="form-group">
+      <label for="materialName">Produsul</label>
+      <input type="text" class="form-control" id="materialName" name="materialName" placeholder="Introduceți produsul" required>
+    </div>
+    <div class="form-group">
+      <label for="price">Pretul</label>
+      <input type="text" class="form-control" id="price" name="price" placeholder="Introduceți pretul" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Salvează produsul</button>
+  </form>
+  <table class="table table-striped table-hover">
+    <thead class="thead-dark">
+    <tr>
+      <th>ID</th>
+      <th>MaterialName</th>
+      <th>Price</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="material : ${materials}">
+      <td th:text="${material.id}"></td>
+      <td th:text="${material.materialName}"></td>
+      <td th:text="${material.price}"></td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+</body>
+</html>
