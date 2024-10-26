@@ -2,11 +2,11 @@ package com.arturfrimu.materialecalculator;
 
 import com.arturfrimu.materialecalculator.DTO.AllMaterialsResponse;
 import com.arturfrimu.materialecalculator.DTO.CreateMaterialsRequest;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -18,10 +18,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Controller
 @RequestMapping
@@ -108,51 +110,76 @@ public class ThymeleafController {
 
     @GetMapping("/materials/print-pdf")
     public ResponseEntity<byte[]> printMaterialsAsPdf(@RequestParam Map<String, String> productToCount) throws DocumentException {
-        // Creează document PDF
         Document document = new Document();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         PdfWriter.getInstance(document, out);
 
         document.open();
+
+        // Setăm o fontă personalizată
+        Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12, BaseColor.WHITE);
+        Font cellFont = FontFactory.getFont(FontFactory.HELVETICA, 10, BaseColor.BLACK);
+
         PdfPTable table = new PdfPTable(4);
         table.setWidthPercentage(100);
         table.setWidths(new int[]{3, 3, 2, 3});
 
-        // Adaugă antetul tabelului
-        table.addCell("Nume Produs");
-        table.addCell("Pret");
-        table.addCell("Cantitate");
-        table.addCell("Pret Total");
+        // Stilizăm antetul tabelului
+        Stream.of("Nume Produs", "Preț", "Cantitate", "Preț Total")
+                .forEach(columnTitle -> {
+                    PdfPCell header = new PdfPCell();
+                    header.setBackgroundColor(BaseColor.DARK_GRAY);
+                    header.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    header.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    header.setPadding(5);
+                    header.setPhrase(new Phrase(columnTitle, headerFont));
+                    table.addCell(header);
+                });
 
-        // Adaugă materialele
+        // Adaugăm materialele în tabel
         BigDecimal totalPrice = BigDecimal.ZERO;
         List<MaterialsEntity> materials = materialRepository.findAll();
         for (MaterialsEntity material : materials) {
-            table.addCell(material.getMaterialName());
-            table.addCell(material.getPrice().toString());
+            // Nume produs
+            PdfPCell nameCell = new PdfPCell(new Phrase(material.getMaterialName(), cellFont));
+            nameCell.setPadding(5);
+            table.addCell(nameCell);
 
-            // Obține cantitatea din parametrii introduși în formular
+            // Preț
+            PdfPCell priceCell = new PdfPCell(new Phrase(material.getPrice().toString(), cellFont));
+            priceCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            priceCell.setPadding(5);
+            table.addCell(priceCell);
+
+            // Cantitate
             String quantityStr = productToCount.get("productToCount[" + material.getId() + "]");
             int quantity = (quantityStr != null && !quantityStr.isEmpty()) ? Integer.parseInt(quantityStr) : 0;
+            PdfPCell quantityCell = new PdfPCell(new Phrase(String.valueOf(quantity), cellFont));
+            quantityCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+            quantityCell.setPadding(5);
+            table.addCell(quantityCell);
 
-            table.addCell(String.valueOf(quantity)); // Adaugă cantitatea
-
-            // Calculează prețul total pentru produs
+            // Preț Total pentru produs
             BigDecimal productTotalPrice = material.getPrice().multiply(BigDecimal.valueOf(quantity));
-            table.addCell(productTotalPrice.toString()); // Adaugă prețul total pentru produs
+            PdfPCell totalCell = new PdfPCell(new Phrase(productTotalPrice.toString(), cellFont));
+            totalCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            totalCell.setPadding(5);
+            table.addCell(totalCell);
 
-            // Adaugă la prețul total general
+            // Calculăm suma totală
             totalPrice = totalPrice.add(productTotalPrice);
         }
 
         document.add(table);
 
-        // Adaugă prețul total
-        document.add(new Paragraph("Suma Totala: " + totalPrice.toString()));
+        // Adăugăm prețul total general
+        Paragraph totalParagraph = new Paragraph("Suma Totală: " + totalPrice.toString(), headerFont);
+        totalParagraph.setAlignment(Element.ALIGN_RIGHT);
+        totalParagraph.setSpacingBefore(10);
+        document.add(totalParagraph);
 
         document.close();
 
-        // Returnează PDF-ul
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
         headers.setContentDispositionFormData("filename", "materials.pdf");
