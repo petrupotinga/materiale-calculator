@@ -116,7 +116,7 @@ public class ThymeleafController {
 
         document.open();
 
-        // Setăm o fontă personalizată
+        // Setăm fonturile
         Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12, BaseColor.WHITE);
         Font cellFont = FontFactory.getFont(FontFactory.HELVETICA, 10, BaseColor.BLACK);
 
@@ -136,19 +136,26 @@ public class ThymeleafController {
                     table.addCell(header);
                 });
 
-        // Adaugăm materialele în tabel
+        // Adăugăm materialele în tabel cu alternarea culorilor
         BigDecimal totalPrice = BigDecimal.ZERO;
         List<MaterialsEntity> materials = materialRepository.findAll();
+        int rowIndex = 0;  // Index pentru a alterna culorile rândurilor
+
         for (MaterialsEntity material : materials) {
+            // Alternăm culoarea de fundal între gri deschis și alb
+            BaseColor backgroundColor = (rowIndex % 2 == 0) ? BaseColor.LIGHT_GRAY : BaseColor.WHITE;
+
             // Nume produs
             PdfPCell nameCell = new PdfPCell(new Phrase(material.getMaterialName(), cellFont));
             nameCell.setPadding(5);
+            nameCell.setBackgroundColor(backgroundColor);
             table.addCell(nameCell);
 
             // Preț
             PdfPCell priceCell = new PdfPCell(new Phrase(material.getPrice().toString(), cellFont));
             priceCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
             priceCell.setPadding(5);
+            priceCell.setBackgroundColor(backgroundColor);
             table.addCell(priceCell);
 
             // Cantitate
@@ -157,6 +164,7 @@ public class ThymeleafController {
             PdfPCell quantityCell = new PdfPCell(new Phrase(String.valueOf(quantity), cellFont));
             quantityCell.setHorizontalAlignment(Element.ALIGN_CENTER);
             quantityCell.setPadding(5);
+            quantityCell.setBackgroundColor(backgroundColor);
             table.addCell(quantityCell);
 
             // Preț Total pentru produs
@@ -164,15 +172,18 @@ public class ThymeleafController {
             PdfPCell totalCell = new PdfPCell(new Phrase(productTotalPrice.toString(), cellFont));
             totalCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
             totalCell.setPadding(5);
+            totalCell.setBackgroundColor(backgroundColor);
             table.addCell(totalCell);
 
             // Calculăm suma totală
             totalPrice = totalPrice.add(productTotalPrice);
+
+            rowIndex++;  // Incrementăm indexul pentru a alterna culorile
         }
 
         document.add(table);
 
-        // Adăugăm prețul total general
+        // Adăugăm suma totală generală
         Paragraph totalParagraph = new Paragraph("Suma Totală: " + totalPrice.toString(), headerFont);
         totalParagraph.setAlignment(Element.ALIGN_RIGHT);
         totalParagraph.setSpacingBefore(10);
