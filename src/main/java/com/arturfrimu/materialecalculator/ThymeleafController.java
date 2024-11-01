@@ -85,7 +85,7 @@ public class ThymeleafController {
         return "materials-view";
     }
 
-    @PostMapping("/materials/delete")
+    @GetMapping("/materials/delete")
     public String deleteMaterial(@RequestParam("deletematerialId") Long materialId, Model model) {
         materialRepository.findById(materialId)
                 .ifPresentOrElse(
