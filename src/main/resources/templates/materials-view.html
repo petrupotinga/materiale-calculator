@@ -6,9 +6,16 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <script>
-        function toggleForm(formId) {
+        function toggleForm(formId, productId) {
             const form = document.getElementById(formId);
-            form.style.display = (form.style.display === "none" || form.style.display === "") ? "block" : "none";
+            if (form.style.display === "none" || form.style.display === "") {
+                form.style.display = "block";
+            } else {
+                form.style.display = "none";
+            }
+
+            const updateInputId = document.getElementById("materialId");
+            updateInputId.value = productId;
         }
 
         function calculateProductPrice(input, price, row) {
@@ -52,10 +59,10 @@
 <div class="container">
     <h1>Lista Materialelor</h1>
     <button type="button" class="btn btn-primary mt-1" onclick="toggleForm('addForm')">
-        <i class="bi bi-plus-square-fill"></i> Adaugă Material
+        <i class="bi bi-plus-square-fill"></i>
     </button>
     <form th:action="@{/materials/print-pdf}" method="get">
-        <table class="table table-striped table-hover mt-3">
+        <table class="table table-striped table-hover">
             <thead class="thead-dark">
             <tr>
                 <th>ID</th>
@@ -63,7 +70,16 @@
                 <th>Pret</th>
                 <th>Cantitate</th>
                 <th>Pret Total</th>
-                <th>Acțiuni</th>
+                <th style="width: 10px">
+                    <button type="button" class="btn btn-primary">
+                        <i class="bi bi-pen"></i>
+                    </button>
+                </th>
+                <th style="width: 10px">
+                    <button type="button" class="btn btn-danger">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </th>
             </tr>
             </thead>
             <tbody>
@@ -75,27 +91,28 @@
                     <input type="number" th:name="'productToCount[' + ${material.id} + ']'" min="0" value="0"/>
                 </td>
                 <td class="product-total-price">0.00</td>
-                <td>
+                <td style="width: 10px">
                     <button type="button" class="btn btn-primary"
-                            onclick="toggleForm('updatePriceForm'); document.getElementById('priceMaterialId').value='${material.id}'">
-                        <i class="bi bi-pen"></i> Actualizează Preț
+                            th:onclick="'toggleForm(\'updateForm\', ' + ${material.id} + ')'">
+                        <i class="bi bi-pen"></i>
                     </button>
-                    <button type="button" class="btn btn-warning"
-                            onclick="toggleForm('updateNameForm'); document.getElementById('nameMaterialId').value='${material.id}'">
-                        <i class="bi bi-pencil-square"></i> Editează Numele
-                    </button>
+                </td>
+                <td style="width: 10px">
                     <button type="button" class="btn btn-danger"
                             th:onclick="'window.location.href=\'/materials/delete?deletematerialId=' + ${material.id} + '\''">
-                        <i class="bi bi-trash"></i> Șterge
+                        <i class="bi bi-trash"></i>
                     </button>
                 </td>
             </tr>
             </tbody>
         </table>
 
+        <!-- Afișăm prețul total -->
         <div class="mt-4">
             <h3>Suma Totala: <span class="total-price">0.00</span></h3>
         </div>
+
+        <!-- Buton pentru a descărca PDF-ul -->
         <button type="submit" class="btn btn-dark mt-4">Descarcă PDF</button>
     </form>
 
@@ -108,37 +125,25 @@
         </div>
         <div class="form-group">
             <label for="price">Prețul</label>
-            <input type="number" class="form-control" id="price" name="price" placeholder="Introduceți prețul" required>
+            <input type="text" class="form-control" id="price" name="price" placeholder="Introduceți prețul" required>
         </div>
         <button type="submit" class="btn btn-dark">Salvează produsul</button>
     </form>
 
     <!-- Formular pentru actualizarea prețului materialului (ascuns inițial) -->
-    <form id="updatePriceForm" th:action="@{/materials/update-price}" method="post" class="mb-4" style="display: none;">
+    <form id="updateForm" th:action="@{/materials/update-price}" method="post" class="mb-4" style="display: none;">
         <h3>Actualizează Prețul Produsului</h3>
         <div class="form-group">
-            <label for="priceMaterialId">ID Material</label>
-            <input type="number" class="form-control" id="priceMaterialId" name="materialId" placeholder="Introduceți ID-ul materialului" required readonly>
+            <label for="materialId">ID Material</label>
+            <input type="number" class="form-control" id="materialId" name="materialId"
+                   placeholder="Introduceți ID-ul materialului" required>
         </div>
         <div class="form-group">
             <label for="newPrice">Preț Nou</label>
-            <input type="number" step="0.01" class="form-control" id="newPrice" name="newPrice" placeholder="Introduceți noul preț" required>
+            <input type="number" step="0.01" class="form-control" id="newPrice" name="newPrice"
+                   placeholder="Introduceți noul preț" required>
         </div>
         <button type="submit" class="btn btn-dark">Actualizează Prețul</button>
-    </form>
-
-    <!-- Formular pentru actualizarea numelui materialului (ascuns inițial) -->
-    <form id="updateNameForm" th:action="@{/materials/update-name}" method="post" class="mb-4" style="display: none;">
-        <h3>Actualizează Numele Produsului</h3>
-        <div class="form-group">
-            <label for="nameMaterialId">ID Material</label>
-            <input type="number" class="form-control" id="nameMaterialId" name="materialId" placeholder="Introduceți ID-ul materialului" required readonly>
-        </div>
-        <div class="form-group">
-            <label for="newName">Nume Nou</label>
-            <input type="text" class="form-control" id="newName" name="newName" placeholder="Introduceți noul nume" required>
-        </div>
-        <button type="submit" class="btn btn-dark">Actualizează Numele</button>
     </form>
 </div>
 </body>
