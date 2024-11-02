@@ -6,7 +6,6 @@ import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -18,7 +17,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -125,7 +123,7 @@ public class ThymeleafController {
         table.setWidths(new int[]{3, 3, 2, 3});
 
         // Stilizăm antetul tabelului
-        Stream.of("Nume Produs", "Preț", "Cantitate", "Preț Total")
+        Stream.of("Nume Produs", "Pret", "Cantitate", "Pret Total")
                 .forEach(columnTitle -> {
                     PdfPCell header = new PdfPCell();
                     header.setBackgroundColor(BaseColor.DARK_GRAY);
@@ -184,7 +182,8 @@ public class ThymeleafController {
         document.add(table);
 
         // Adăugăm suma totală generală
-        Paragraph totalParagraph = new Paragraph("Suma Totală: " + totalPrice.toString(), headerFont);
+        Font totalFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12, BaseColor.BLACK);
+        Paragraph totalParagraph = new Paragraph("Suma Totala: " + totalPrice.toString(), totalFont);
         totalParagraph.setAlignment(Element.ALIGN_RIGHT);
         totalParagraph.setSpacingBefore(10);
         document.add(totalParagraph);
