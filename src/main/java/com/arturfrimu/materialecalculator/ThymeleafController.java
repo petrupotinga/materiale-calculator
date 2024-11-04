@@ -140,6 +140,15 @@ public class ThymeleafController {
         int rowIndex = 0;  // Index pentru a alterna culorile rândurilor
 
         for (MaterialsEntity material : materials) {
+            // Obținem cantitatea pentru produs
+            String quantityStr = productToCount.get("productToCount[" + material.getId() + "]");
+            int quantity = (quantityStr != null && !quantityStr.isEmpty()) ? Integer.parseInt(quantityStr) : 0;
+
+            // Dacă cantitatea este 0, trecem la următorul produs
+            if (quantity == 0) {
+                continue;
+            }
+
             // Alternăm culoarea de fundal între gri deschis și alb
             BaseColor backgroundColor = (rowIndex % 2 == 0) ? BaseColor.LIGHT_GRAY : BaseColor.WHITE;
 
@@ -157,8 +166,6 @@ public class ThymeleafController {
             table.addCell(priceCell);
 
             // Cantitate
-            String quantityStr = productToCount.get("productToCount[" + material.getId() + "]");
-            int quantity = (quantityStr != null && !quantityStr.isEmpty()) ? Integer.parseInt(quantityStr) : 0;
             PdfPCell quantityCell = new PdfPCell(new Phrase(String.valueOf(quantity), cellFont));
             quantityCell.setHorizontalAlignment(Element.ALIGN_CENTER);
             quantityCell.setPadding(5);
@@ -175,12 +182,9 @@ public class ThymeleafController {
 
             // Calculăm suma totală
             totalPrice = totalPrice.add(productTotalPrice);
-
             rowIndex++;  // Incrementăm indexul pentru a alterna culorile
         }
-
         document.add(table);
-
         // Adăugăm suma totală generală
         Font totalFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12, BaseColor.BLACK);
         Paragraph totalParagraph = new Paragraph("Suma Totala: " + totalPrice.toString(), totalFont);
